@@ -41,7 +41,29 @@ def download_album(artist: str, album_name: str):
         console.print("[dim]Downloading cover art...[/]")
         download_cover_art(album_info.cover_url_hq, cover_path)
     
-    # Show tracks table
+    # Ask which tracks to download using interactive checkbox
+    import questionary
+    
+    choices = []
+    for t in tracks:
+        est_size = utils.calculate_estimated_size(t.duration_ms)
+        duration_fmt = utils.format_duration(t.duration_ms)
+        label = f"{t.track_number:02d}. {t.title} ({duration_fmt}, {est_size})"
+        choices.append(questionary.Choice(title=label, value=t, checked=True))
+    
+    console.print()
+    selected_tracks = questionary.checkbox(
+        "Select the tracks you want to download (Space to select/deselect, Enter to confirm):",
+        choices=choices
+    ).ask()
+    
+    if not selected_tracks:
+        console.print("[bold yellow]No tracks selected. Download cancelled.[/]")
+        return
+        
+    console.print()
+    
+    # Show summary of selected tracks
     table = Table(show_header=True, header_style="bold magenta")
     table.add_column("#", style="dim", width=3)
     table.add_column("Title")
@@ -49,7 +71,7 @@ def download_album(artist: str, album_name: str):
     table.add_column("Est. Size", justify="right", style="cyan")
     
     total_ms = 0
-    for t in tracks:
+    for t in selected_tracks:
         total_ms += t.duration_ms
         table.add_row(
             str(t.track_number), 
@@ -60,10 +82,9 @@ def download_album(artist: str, album_name: str):
         
     console.print(table)
     total_size = utils.calculate_estimated_size(total_ms)
-    console.print(f"Total Estimated Size: [bold yellow]{total_size}[/]")
+    console.print(f"Total Selected Estimated Size: [bold yellow]{total_size}[/]")
     console.print(f"Output directory: [bold cyan]{album_dir}[/]\n")
     
-    # Ask for confirmation
     import typer
     if not typer.confirm("Do you want to proceed with the download?"):
         console.print("[bold yellow]Download cancelled by user.[/]")
@@ -71,7 +92,7 @@ def download_album(artist: str, album_name: str):
         
     console.print()
     
-    # 4. Process each track
+    # 4. Process selected tracks
     success_count = 0
     with Progress(
         SpinnerColumn(),
@@ -80,9 +101,9 @@ def download_album(artist: str, album_name: str):
         TaskProgressColumn(),
         console=console
     ) as progress:
-        album_task = progress.add_task("[bold green]Downloading Album...", total=len(tracks))
+        album_task = progress.add_task("[bold green]Downloading Selected Tracks...", total=len(selected_tracks))
         
-        for track in tracks:
+        for track in selected_tracks:
             track_desc = f"{track.track_number:02d}. {track.title}"
             track_task = progress.add_task(f"Downloading [cyan]{track_desc}[/]...", total=100)
             
@@ -130,5 +151,5 @@ def download_album(artist: str, album_name: str):
             # Small sleep to be polite to the APIs
             time.sleep(1)
 
-    console.print(f"\n[bold green]✅ Album complete! Downloaded {success_count}/{len(tracks)} tracks.[/]")
+    console.print(f"\n[bold green]✅ Download complete! Downloaded {success_count}/{len(selected_tracks)} tracks.[/]")
     console.print(f"Check your files at: [bold cyan]{album_dir}[/]")
