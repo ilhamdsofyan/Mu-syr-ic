@@ -12,6 +12,16 @@ def sanitize_filename(name: str) -> str:
         sanitized = "Unknown"
     return sanitized
 
+def calculate_estimated_size(duration_ms: int, bitrate_kbps: int = 256) -> str:
+    """Calculates estimated file size based on duration and bitrate."""
+    if not duration_ms:
+        return "0.0 MB"
+    
+    seconds = duration_ms / 1000
+    # Bitrate is kilobits per second. Divide by 8 for kilobytes, 1024 for MB.
+    size_mb = (seconds * bitrate_kbps) / 8 / 1024
+    return f"{size_mb:.1f} MB"
+
 def format_duration(ms: int) -> str:
     """Formats duration in milliseconds to MM:SS string."""
     if not ms:

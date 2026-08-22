@@ -46,11 +46,21 @@ def download_album(artist: str, album_name: str):
     table.add_column("#", style="dim", width=3)
     table.add_column("Title")
     table.add_column("Duration", justify="right")
+    table.add_column("Est. Size", justify="right", style="cyan")
     
+    total_ms = 0
     for t in tracks:
-        table.add_row(str(t.track_number), t.title, utils.format_duration(t.duration_ms))
+        total_ms += t.duration_ms
+        table.add_row(
+            str(t.track_number), 
+            t.title, 
+            utils.format_duration(t.duration_ms),
+            utils.calculate_estimated_size(t.duration_ms)
+        )
         
     console.print(table)
+    total_size = utils.calculate_estimated_size(total_ms)
+    console.print(f"Total Estimated Size: [bold yellow]{total_size}[/]")
     console.print(f"Output directory: [bold cyan]{album_dir}[/]\n")
     
     # 4. Process each track
