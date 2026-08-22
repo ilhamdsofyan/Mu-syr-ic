@@ -1,0 +1,6 @@
+yt-dlp
+mutagen
+typer
+rich
+thefuzz
+requests
