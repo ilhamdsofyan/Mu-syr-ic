@@ -45,12 +45,16 @@ def download_album(artist: str, album_name: str):
     import questionary
     
     choices = []
+    total_album_ms = 0
     for t in tracks:
+        total_album_ms += t.duration_ms
         est_size = utils.calculate_estimated_size(t.duration_ms)
         duration_fmt = utils.format_duration(t.duration_ms)
         label = f"{t.track_number:02d}. {t.title} ({duration_fmt}, {est_size})"
         choices.append(questionary.Choice(title=label, value=t, checked=True))
     
+    total_album_size = utils.calculate_estimated_size(total_album_ms)
+    console.print(f"Total Album Estimated Size: [bold yellow]{total_album_size}[/]")
     console.print()
     selected_tracks = questionary.checkbox(
         "Select the tracks you want to download (Space to select/deselect, Enter to confirm):",
