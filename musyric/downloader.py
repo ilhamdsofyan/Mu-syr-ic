@@ -63,6 +63,14 @@ def download_album(artist: str, album_name: str):
     console.print(f"Total Estimated Size: [bold yellow]{total_size}[/]")
     console.print(f"Output directory: [bold cyan]{album_dir}[/]\n")
     
+    # Ask for confirmation
+    import typer
+    if not typer.confirm("Do you want to proceed with the download?"):
+        console.print("[bold yellow]Download cancelled by user.[/]")
+        return
+        
+    console.print()
+    
     # 4. Process each track
     success_count = 0
     with Progress(
