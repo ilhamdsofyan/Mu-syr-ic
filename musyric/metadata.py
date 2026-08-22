@@ -3,8 +3,15 @@ from mutagen.mp4 import MP4, MP4Cover
 from typing import Optional
 from .itunes_client import TrackInfo
 
-def embed_metadata(file_path: Path, track: TrackInfo, cover_path: Optional[Path] = None, total_tracks: int = 0) -> bool:
-    """Embeds ID3/MP4 metadata and cover art into the audio file."""
+def embed_metadata(
+    file_path: Path, 
+    track: TrackInfo, 
+    cover_path: Optional[Path] = None, 
+    total_tracks: int = 0,
+    plain_lyrics: Optional[str] = None,
+    synced_lyrics: Optional[str] = None
+) -> bool:
+    """Embeds ID3/MP4 metadata, cover art, and lyrics into the audio file."""
     if not file_path.exists():
         return False
         
@@ -18,6 +25,12 @@ def embed_metadata(file_path: Path, track: TrackInfo, cover_path: Optional[Path]
         audio["\xa9day"] = track.year
         audio["\xa9gen"] = track.genre
         
+        # Embed Lyrics into M4A tag
+        if plain_lyrics:
+            audio["\xa9lyr"] = plain_lyrics
+        elif synced_lyrics:
+            audio["\xa9lyr"] = synced_lyrics
+        
         # Track number is a tuple (track_number, total_tracks)
         audio["trkn"] = [(track.track_number, total_tracks)]
         
@@ -29,6 +42,13 @@ def embed_metadata(file_path: Path, track: TrackInfo, cover_path: Optional[Path]
                 audio["covr"] = [MP4Cover(cover_data, imageformat=MP4Cover.FORMAT_JPEG)]
                 
         audio.save()
+        
+        # Save synced .lrc file alongside the track for players like AIMP
+        if synced_lyrics:
+            lrc_path = file_path.with_suffix(".lrc")
+            with open(lrc_path, "w", encoding="utf-8") as f:
+                f.write(synced_lyrics)
+                
         return True
     except Exception as e:
         print(f"Error embedding metadata: {e}")

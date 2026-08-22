@@ -8,6 +8,7 @@ from . import config, utils
 from .itunes_client import search_album, get_tracks, download_cover_art
 from .youtube_client import search_track, download_audio
 from .metadata import embed_metadata
+from .lyrics_client import fetch_lyrics
 
 console = Console()
 
@@ -144,9 +145,25 @@ def download_album(artist: str, album_name: str):
                 progress.advance(album_task)
                 continue
                 
-            # Embed metadata
+            # Fetch lyrics
+            progress.update(track_task, description=f"[magenta]Fetching lyrics:[/] {track_desc}")
+            lyrics_data = fetch_lyrics(
+                track_name=track.title,
+                artist_name=album_info.artist,
+                album_name=album_info.album,
+                duration_s=track.duration_ms // 1000 if track.duration_ms else None
+            )
+            
+            # Embed metadata & lyrics
             progress.update(track_task, description=f"[blue]Embedding tags:[/] {track_desc}")
-            embed_metadata(file_path, track, cover_path, len(tracks))
+            embed_metadata(
+                file_path=file_path, 
+                track=track, 
+                cover_path=cover_path, 
+                total_tracks=len(tracks),
+                plain_lyrics=lyrics_data.plain_lyrics,
+                synced_lyrics=lyrics_data.synced_lyrics
+            )
             
             progress.update(track_task, completed=100, description=f"[green]✓ Completed:[/] {track_desc}")
             progress.advance(album_task)
