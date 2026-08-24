@@ -126,9 +126,50 @@ def get_downloaded_track_numbers(collection_id: int) -> Set[int]:
                 existing_tracks.add(r["track_number"])
         return existing_tracks
 
+def sync_from_disk():
+    """Scans the music directory on disk and populates SQLite database with existing audio files and tags."""
+    init_db()
+    music_dir = config.get_output_dir()
+    if not music_dir.exists():
+        return
+        
+    try:
+        from mutagen.mp4 import MP4
+    except ImportError:
+        return
+        
+    for m4a_file in music_dir.glob("*/*/*.m4a"):
+        try:
+            audio = MP4(m4a_file)
+            title = audio.get("\xa9nam", [m4a_file.stem])[0]
+            artist = audio.get("\xa9ART", [m4a_file.parent.parent.name])[0]
+            album = audio.get("\xa9alb", [m4a_file.parent.name])[0]
+            year = str(audio.get("\xa9day", [""])[0]) if audio.get("\xa9day") else ""
+            trkn = audio.get("trkn", [(0, 0)])[0]
+            track_number = trkn[0] if isinstance(trkn, (tuple, list)) else 0
+            total_tracks = trkn[1] if isinstance(trkn, (tuple, list)) and len(trkn) > 1 else 0
+            
+            # Deterministic pseudo-collection_id based on artist and album hash if not tracked
+            cid = abs(hash(f"{artist.lower()}:{album.lower()}")) % (10**9)
+            
+            record_download(
+                collection_id=cid,
+                artist=artist,
+                album=album,
+                track_count=total_tracks,
+                year=year,
+                folder_path=m4a_file.parent,
+                track_number=track_number,
+                title=title,
+                file_path=m4a_file
+            )
+        except Exception:
+            continue
+
 def get_all_history() -> List[Dict[str, Any]]:
     """Returns all downloaded albums with their track counts from SQLite."""
     init_db()
+    sync_from_disk()
     with get_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
