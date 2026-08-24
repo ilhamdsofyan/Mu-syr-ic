@@ -11,8 +11,9 @@ if sys.stdout.encoding.lower() != 'utf-8':
     except AttributeError:
         pass
 
-from . import __version__
+from . import __version__, db
 from .downloader import download_album
+from rich.table import Table
 
 app = typer.Typer(
     name="musyric",
@@ -35,6 +36,33 @@ def download(
     except Exception as e:
         console.print(f"\n[bold red]❌ An unexpected error occurred:[/] {e}")
         raise typer.Exit(1)
+
+@app.command()
+def history():
+    """List all downloaded albums and their tracks tracked in SQLite database."""
+    records = db.get_all_history()
+    if not records:
+        console.print("[yellow]No download history found in database.[/]")
+        return
+        
+    table = Table(title="🎵 Downloaded Albums History", show_header=True, header_style="bold magenta")
+    table.add_column("Artist", style="cyan")
+    table.add_column("Album", style="bold white")
+    table.add_column("Year", justify="center", style="dim")
+    table.add_column("Tracks", justify="right", style="green")
+    table.add_column("Last Downloaded", style="dim")
+    
+    for r in records:
+        track_str = f"{r['downloaded_tracks']}/{r['track_count'] or '?'}"
+        table.add_row(
+            r["artist"],
+            r["album"],
+            r["year"] or "-",
+            track_str,
+            str(r["last_downloaded_at"])[:16]
+        )
+        
+    console.print(table)
 
 @app.command()
 def version():

@@ -5,7 +5,8 @@ A sleek Python CLI tool to download full music albums. It uses the **iTunes Sear
 Features:
 - **Zero Config**: No API keys or authentication required.
 - **Interactive Album Picker**: Type just the artist name to browse and pick an album interactively.
-- **Interactive Track Selection**: Choose specific tracks using interactive checkboxes.
+- **Downloaded Album & Track Detection**: Automatically detects already downloaded albums and tracks via SQLite database (`~/.musyric/history.db`) and disk scanner.
+- **Interactive Track Selection**: Choose specific tracks using interactive checkboxes (already downloaded tracks are un-checked by default).
 - **Auto Lyrics**: Automatically embeds tags and generates synchronized `.lrc` files (via LRCLIB) for players like AIMP.
 - **High Quality**: Downloads audio as M4A (AAC 256kbps).
 - **Smart Search**: iTunes API + YouTube Music matching.
@@ -38,7 +39,7 @@ pip install -r requirements.txt
 ## Usage
 
 ### 1. Interactive Mode (Browse Albums)
-Just provide the artist name, and browse their discography:
+Just provide the artist name, browse their discography, and see which albums are already downloaded:
 ```bash
 python -m musyric.cli download "Coldplay"
 ```
@@ -47,6 +48,12 @@ python -m musyric.cli download "Coldplay"
 Provide both artist and album to download directly:
 ```bash
 python -m musyric.cli download "Radiohead" "OK Computer"
+```
+
+### 3. View Download History
+View all albums and tracks you have downloaded:
+```bash
+python -m musyric.cli history
 ```
 
 The downloaded album will be saved in your `~/Music` directory by default, organized as `~/Music/Artist/Album/`.
