@@ -148,11 +148,11 @@ def download_album(artist: str, album_name: Optional[str] = None):
         TaskProgressColumn(),
         console=console
     ) as progress:
-        album_task = progress.add_task("[bold green]Downloading Selected Tracks...", total=len(selected_tracks))
+        album_task = progress.add_task("[bold green]Overall Progress...", total=len(selected_tracks))
+        track_task = progress.add_task("[cyan]Preparing...", total=100)
         
         for track in selected_tracks:
             track_desc = f"{track.track_number:02d}. {track.title}"
-            track_task = progress.add_task(f"Downloading [cyan]{track_desc}[/]...", total=100)
             
             # Formulate filename
             filename = config.TRACK_NAMING_TEMPLATE.format(
@@ -175,31 +175,32 @@ def download_album(artist: str, album_name: Optional[str] = None):
                     title=track.title,
                     file_path=file_path
                 )
-                progress.update(track_task, completed=100, description=f"[green]✓ Skipped (exists): {track_desc}[/]")
+                progress.update(track_task, completed=100, description=f"[dim green]Skipping:[/] {track_desc}")
+                progress.console.print(f"[dim green]✓ Skipped (exists):[/] {track_desc}")
                 progress.advance(album_task)
                 success_count += 1
                 continue
                 
             # Search YouTube
-            progress.update(track_task, description=f"[cyan]Searching YT:[/] {track_desc}")
+            progress.update(track_task, completed=10, description=f"[cyan]Searching YT:[/] {track_desc}")
             yt_url = search_track(album_info.artist, track.title)
             
             if not yt_url:
-                progress.update(track_task, description=f"[red]❌ Not found on YT:[/] {track_desc}")
+                progress.console.print(f"[red]❌ Not found on YT:[/] {track_desc}")
                 progress.advance(album_task)
                 continue
                 
             # Download audio
-            progress.update(track_task, description=f"[yellow]Downloading:[/] {track_desc}")
+            progress.update(track_task, completed=40, description=f"[yellow]Downloading:[/] {track_desc}")
             dl_success = download_audio(yt_url, file_path)
             
             if not dl_success:
-                progress.update(track_task, description=f"[red]❌ Download failed:[/] {track_desc}")
+                progress.console.print(f"[red]❌ Download failed:[/] {track_desc}")
                 progress.advance(album_task)
                 continue
                 
             # Fetch lyrics
-            progress.update(track_task, description=f"[magenta]Fetching lyrics:[/] {track_desc}")
+            progress.update(track_task, completed=75, description=f"[magenta]Fetching lyrics:[/] {track_desc}")
             lyrics_data = fetch_lyrics(
                 track_name=track.title,
                 artist_name=album_info.artist,
@@ -208,7 +209,7 @@ def download_album(artist: str, album_name: Optional[str] = None):
             )
             
             # Embed metadata & lyrics
-            progress.update(track_task, description=f"[blue]Embedding tags:[/] {track_desc}")
+            progress.update(track_task, completed=90, description=f"[blue]Embedding tags:[/] {track_desc}")
             embed_metadata(
                 file_path=file_path, 
                 track=track, 
@@ -231,7 +232,8 @@ def download_album(artist: str, album_name: Optional[str] = None):
                 file_path=file_path
             )
             
-            progress.update(track_task, completed=100, description=f"[green]✓ Completed:[/] {track_desc}")
+            progress.update(track_task, completed=100, description=f"[green]Completed:[/] {track_desc}")
+            progress.console.print(f"[green]✓ Completed:[/] {track_desc}")
             progress.advance(album_task)
             success_count += 1
             
