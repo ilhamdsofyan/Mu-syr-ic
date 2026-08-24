@@ -1,28 +1,53 @@
 import time
+from typing import Optional
 from pathlib import Path
+import questionary
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskProgressColumn
 from rich.table import Table
 
 from . import config, utils
-from .itunes_client import search_album, get_tracks, download_cover_art
+from .itunes_client import search_album, get_artist_albums, get_tracks, download_cover_art, AlbumInfo
 from .youtube_client import search_track, download_audio
 from .metadata import embed_metadata
 from .lyrics_client import fetch_lyrics
 
 console = Console()
 
-def download_album(artist: str, album_name: str):
+def download_album(artist: str, album_name: Optional[str] = None):
     """Orchestrates the entire album download process."""
-    console.print(f"[bold blue]🔍 Searching iTunes API for:[/] {artist} - {album_name}")
-    
-    # 1. Search iTunes
-    album_info = search_album(artist, album_name)
-    if not album_info:
-        console.print("[bold red]❌ Album not found on iTunes.[/]")
-        return
+    if album_name:
+        console.print(f"[bold blue]🔍 Searching iTunes API for:[/] {artist} - {album_name}")
+        album_info = search_album(artist, album_name)
+        if not album_info:
+            console.print("[bold red]❌ Album not found on iTunes.[/]")
+            return
+    else:
+        console.print(f"[bold blue]🔍 Searching albums by artist:[/] {artist}")
+        albums = get_artist_albums(artist)
+        if not albums:
+            console.print(f"[bold red]❌ No albums found for artist '{artist}' on iTunes.[/]")
+            return
+            
+        choices = []
+        for alb in albums:
+            year_str = f", {alb.year}" if alb.year else ""
+            label = f"{alb.album} ({alb.track_count} tracks{year_str})"
+            choices.append(questionary.Choice(title=label, value=alb))
+            
+        console.print()
+        selected = questionary.select(
+            f"Select an album by {artist} (Use arrow keys to move, Enter to confirm):",
+            choices=choices
+        ).ask()
         
-    console.print(f"[bold green]📀 Found album:[/] {album_info.album} by {album_info.artist} ({album_info.track_count} tracks)")
+        if not selected:
+            console.print("[bold yellow]No album selected. Download cancelled.[/]")
+            return
+            
+        album_info = selected
+        
+    console.print(f"[bold green]📀 Selected album:[/] {album_info.album} by {album_info.artist} ({album_info.track_count} tracks)")
     
     # Setup directories
     base_dir = config.get_output_dir()
@@ -43,8 +68,6 @@ def download_album(artist: str, album_name: str):
         download_cover_art(album_info.cover_url_hq, cover_path)
     
     # Ask which tracks to download using interactive checkbox
-    import questionary
-    
     choices = []
     total_album_ms = 0
     for t in tracks:

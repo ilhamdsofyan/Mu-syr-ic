@@ -1,4 +1,5 @@
 import sys
+from typing import Optional
 import typer
 from rich.console import Console
 
@@ -23,9 +24,9 @@ console = Console()
 @app.command()
 def download(
     artist: str = typer.Argument(..., help="Name of the artist"),
-    album: str = typer.Argument(..., help="Name of the album")
+    album: Optional[str] = typer.Argument(None, help="Name of the album (optional, shows album list if omitted)")
 ):
-    """Download an entire album."""
+    """Download an entire album. If album name is omitted, an interactive list of albums by the artist will be displayed."""
     try:
         download_album(artist, album)
     except KeyboardInterrupt:
