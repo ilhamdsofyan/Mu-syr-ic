@@ -119,9 +119,29 @@ def download_album(artist: str, album_name: Optional[str] = None):
         
         tracks = get_tracks(album_info.collection_id)
         if not tracks:
-            console.print("[bold red]❌ Could not retrieve tracklist.[/]")
-            current_album_name = None
-            continue
+            console.print(f"[bold red]❌ Could not retrieve tracklist for '{album_info.album}'.[/]")
+            action = questionary.select(
+                "What would you like to do?",
+                choices=[
+                    questionary.Choice(title=f"💿 Choose another album by '{current_artist}'", value="choose_album"),
+                    questionary.Choice(title="👤 Search another artist", value="change_artist"),
+                    questionary.Choice(title="❌ Cancel", value="cancel"),
+                ]
+            ).ask()
+            if action == "choose_album":
+                current_album_name = None
+                continue
+            elif action == "change_artist":
+                new_art = questionary.text("Enter artist name:").ask()
+                if not new_art or not new_art.strip():
+                    console.print("[yellow]Cancelled.[/]")
+                    return
+                current_artist = new_art.strip()
+                current_album_name = None
+                continue
+            else:
+                console.print("[bold yellow]Cancelled by user.[/]")
+                return
             
         cover_path = album_dir / "cover.jpg"
         if not cover_path.exists():
