@@ -37,7 +37,17 @@ chmod +x install.sh && bash install.sh
 chmod +x install.sh && bash install.sh
 ```
 
-After installation, a **`musyric`** launcher is created automatically. You can use it right away:
+After installation, **double-click the launcher** to open the app:
+
+| OS | Double-click this file |
+|----|----------------------|
+| 🪟 Windows | **`start.bat`** |
+| 🍎 macOS | **`start.command`** |
+| 🐧 Linux | **`start.sh`** |
+
+The app opens as an interactive terminal with a main menu — search artists, pick albums, download, and loop back. No commands to memorize.
+
+You can also use the CLI directly:
 ```bash
 # Windows
 musyric.bat download "Coldplay"
