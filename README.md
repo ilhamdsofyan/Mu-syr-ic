@@ -11,7 +11,47 @@ Features:
 - **High Quality**: Downloads audio as M4A (AAC 256kbps).
 - **Smart Search**: iTunes API + YouTube Music matching.
 
-## Prerequisites
+## ⚡ One-Click Install
+
+Just clone the repo and run the installer for your OS — **no prior knowledge needed!** The installer handles Python, FFmpeg, virtual environments, and all dependencies for you.
+
+```bash
+git clone https://github.com/ilhamdsofyan/Mu-syr-ic.git
+cd Mu-syr-ic
+```
+
+### 🪟 Windows
+Double-click **`install.bat`** or run it from the terminal:
+```cmd
+install.bat
+```
+
+### 🍎 macOS
+Double-click **`install.command`** in Finder, or run in Terminal:
+```bash
+chmod +x install.sh && bash install.sh
+```
+
+### 🐧 Linux
+```bash
+chmod +x install.sh && bash install.sh
+```
+
+After installation, a **`musyric`** launcher is created automatically. You can use it right away:
+```bash
+# Windows
+musyric.bat download "Coldplay"
+
+# macOS / Linux
+./musyric download "Coldplay"
+```
+
+## 📖 Manual Installation
+
+<details>
+<summary>Click to expand manual setup instructions</summary>
+
+### Prerequisites
 
 - **Python 3.9+**
 - **FFmpeg**: Must be installed on your system.
@@ -19,13 +59,9 @@ Features:
   - macOS: `brew install ffmpeg`
   - Linux: `sudo apt install ffmpeg`
 
-## Installation
+### Steps
 
 ```bash
-# Clone the repository
-git clone https://github.com/ilhamdsofyan/Mu-syr-ic.git
-cd Mu-syr-ic
-
 # Create virtual environment and install dependencies
 python -m venv .venv
 # On Windows
@@ -35,6 +71,7 @@ source .venv/bin/activate
 
 pip install -r requirements.txt
 ```
+</details>
 
 ## Usage
 

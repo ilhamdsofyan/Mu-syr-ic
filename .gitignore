@@ -22,3 +22,7 @@ __pycache__/
 *.m4a
 *.mp3
 cover.jpg
+
+# Generated launcher scripts (created by install.bat / install.sh)
+musyric.bat
+musyric
