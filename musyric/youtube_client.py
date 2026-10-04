@@ -16,7 +16,7 @@ def search_track(artist: str, track: str) -> Optional[str]:
         'http_headers': {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
         },
-        'extractor_args': {'youtube': {'player_client': ['web', 'mweb']}},
+        'extractor_args': {'youtube': {'player_client': ['android', 'web']}},
         'socket_timeout': 30,
         'retries': 3,
         'fragment_retries': 3,
@@ -63,7 +63,7 @@ def download_audio(url: str, output_path: Path) -> bool:
         'http_headers': {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
         },
-        'extractor_args': {'youtube': {'player_client': ['web', 'mweb']}},
+        'extractor_args': {'youtube': {'player_client': ['android', 'web']}},
         'socket_timeout': 30,
         'retries': 3,
         'fragment_retries': 3,
