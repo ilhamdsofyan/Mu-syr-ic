@@ -1,32 +1,29 @@
 @echo off
-chcp 65001 >nul
 setlocal
+chcp 65001 >nul
 
-:: Get script directory (works even from shortcuts or "Run as")
 set "SCRIPT_DIR=%~dp0"
 
-:: Check venv exists
-if not exist "%SCRIPT_DIR%.venv\Scripts\python.exe" (
-    echo.
-    echo  ╔══════════════════════════════════════════════════════╗
-    echo  ║  Mu(syr)ic hasn't been installed yet!               ║
-    echo  ║  Please run install.bat first, then try again.      ║
-    echo  ╚══════════════════════════════════════════════════════╝
-    echo.
-    pause
-    exit /b 1
-)
+if not exist "%SCRIPT_DIR%.venv\Scripts\python.exe" goto :not_installed
 
-:: Set window title
 title Mu(syr)ic - Music Album Downloader
-
-:: Activate venv and launch interactive app
 call "%SCRIPT_DIR%.venv\Scripts\activate.bat"
 python -m musyric.app
+goto :end
 
-:: Keep window open if app crashed
-if %ERRORLEVEL% NEQ 0 (
+:not_installed
+echo.
+echo ========================================================
+echo   Mu(syr)ic is not installed yet!
+echo   Please run install.bat first, then try again.
+echo ========================================================
+echo.
+pause
+exit /b 1
+
+:end
+if errorlevel 1 (
     echo.
-    echo Something went wrong. Press any key to close...
+    echo Press any key to close...
     pause >nul
 )

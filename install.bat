@@ -96,23 +96,24 @@ echo.
 echo 🛠️ Creating musyric.bat launcher...
 (
 echo @echo off
-echo chcp 65001 ^^^>nul
+echo chcp 65001 ^>nul
 echo setlocal
 echo.
-echo if "%%~1"=="" ^(
-echo     echo 🎵 Mu^^(syr^^)ic CLI 🎵
-echo     echo.
-echo     echo Usage: musyric ^<command^> [options]
-echo     echo Example: musyric download "Coldplay"
-echo     echo.
-echo     echo Activating virtual environment and showing help...
-echo     call "%%~dp0.venv\Scripts\activate.bat"
-echo     python -m musyric.cli --help
-echo     exit /b
-echo ^)
-echo.
+echo if "%%~1"=="" goto :help
 echo call "%%~dp0.venv\Scripts\activate.bat"
 echo python -m musyric.cli %%*
+echo exit /b
+echo.
+echo :help
+echo echo 🎵 Mu(syr)ic CLI 🎵
+echo echo.
+echo echo Usage: musyric ^<command^> [options]
+echo echo Example: musyric download "Coldplay"
+echo echo.
+echo echo Activating virtual environment and showing help...
+echo call "%%~dp0.venv\Scripts\activate.bat"
+echo python -m musyric.cli --help
+echo exit /b
 ) > musyric.bat
 
 if %ERRORLEVEL% NEQ 0 (
@@ -126,11 +127,11 @@ echo.
 echo ==============================================================
 echo 🎉 Setup Complete! 🎉
 echo.
-echo You can now use the tool by double-clicking 'musyric.bat' 
-echo or running it from the terminal!
+echo Double-click 'start.bat' to open the interactive app!
+echo Or use 'musyric.bat' for direct CLI commands.
 echo.
 echo Examples:
-echo   musyric.bat
+echo   Double-click start.bat
 echo   musyric.bat download "Rick Astley"
 echo ==============================================================
 echo.
