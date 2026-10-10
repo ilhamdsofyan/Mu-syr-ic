@@ -25,4 +25,5 @@ cover.jpg
 
 # Generated launcher scripts (created by install.bat / install.sh)
 /musyric.bat
+/musyric.sh
 /musyric

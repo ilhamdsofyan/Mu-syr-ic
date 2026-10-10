@@ -8,6 +8,12 @@ if not exist "%SCRIPT_DIR%.venv\Scripts\python.exe" goto :not_installed
 
 title Mu(syr)ic - Music Album Downloader
 call "%SCRIPT_DIR%.venv\Scripts\activate.bat"
+
+if "%~1"=="" goto :interactive
+python -m musyric.cli %*
+goto :end
+
+:interactive
 python -m musyric.app
 goto :end
 

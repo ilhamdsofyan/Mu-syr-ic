@@ -135,8 +135,8 @@ else
 fi
 
 # 7. Create a musyric launcher script
-print_msg "Creating 'musyric' launcher script... 🚀"
-cat << 'EOF' > musyric
+print_msg "Creating 'musyric.sh' launcher script... 🚀"
+cat << 'EOF' > musyric.sh
 #!/usr/bin/env bash
 
 # Get the directory where the script is located
@@ -153,7 +153,7 @@ else
 fi
 EOF
 
-chmod +x musyric
+chmod +x musyric.sh
 
 # 8. Offer to create a symlink
 echo -e "\n${YELLOW}Would you like to install the 'musyric' command globally? (Requires sudo)${NC}"
@@ -161,17 +161,19 @@ read -p "(y/n) " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     if [[ -w /usr/local/bin ]] || sudo -n true 2>/dev/null || sudo echo -n ""; then
-        sudo ln -sf "$(pwd)/musyric" /usr/local/bin/musyric
+        sudo ln -sf "$(pwd)/musyric.sh" /usr/local/bin/musyric
         print_msg "Created symlink in /usr/local/bin/musyric! 🔗"
     else
-        print_warn "Could not create symlink (sudo failed or cancelled). You can still run it via ./musyric"
+        print_warn "Could not create symlink (sudo failed or cancelled). You can still run it via ./musyric.sh"
     fi
 fi
 
-# 11. Show Setup Complete
+# 9. Show Setup Complete
 echo -e "\n${GREEN}🎉 Setup Complete! 🎉${NC}\n"
-echo -e "You can now run Mu(syr)ic by executing:"
-echo -e "  ${BLUE}./musyric${NC}"
+echo -e "You can now run Mu(syr)ic interactively by executing:"
+echo -e "  ${BLUE}./start.sh${NC} (or double-click ${BLUE}start.command${NC} on macOS)"
+echo -e "\nOr run CLI commands via:"
+echo -e "  ${BLUE}./musyric.sh${NC}"
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     echo -e "Or simply from anywhere:"
     echo -e "  ${BLUE}musyric${NC}"

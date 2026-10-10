@@ -53,7 +53,8 @@ You can also use the CLI directly:
 musyric.bat download "Coldplay"
 
 # macOS / Linux
-./musyric download "Coldplay"
+./musyric.sh download "Coldplay"
+# (or simply: musyric download "Coldplay" if installed globally)
 ```
 
 ## 📖 Manual Installation
