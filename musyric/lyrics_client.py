@@ -61,11 +61,23 @@ def fetch_lyrics(track_name: str, artist_name: str, album_name: Optional[str] = 
         except Exception:
             pass
 
-    # 1b. Without album restriction (loose get)
+    # 1b. Without album restriction
     for t in titles_to_try:
         params = {"track_name": t, "artist_name": artist_name}
         if duration_s:
             params["duration"] = str(duration_s)
+        try:
+            resp = requests.get(f"{base_url}/get", params=params, headers=headers, timeout=5)
+            if resp.status_code == 200:
+                data = resp.json()
+                if data.get("plainLyrics") or data.get("syncedLyrics"):
+                    return LyricsData(plain_lyrics=data.get("plainLyrics"), synced_lyrics=data.get("syncedLyrics"))
+        except Exception:
+            pass
+
+    # 1c. Without duration or album restriction (pure track + artist)
+    for t in titles_to_try:
+        params = {"track_name": t, "artist_name": artist_name}
         try:
             resp = requests.get(f"{base_url}/get", params=params, headers=headers, timeout=5)
             if resp.status_code == 200:

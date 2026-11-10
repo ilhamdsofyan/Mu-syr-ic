@@ -43,11 +43,17 @@ def embed_metadata(
                 
         audio.save()
         
-        # Save synced .lrc file alongside the track for players like AIMP
+        # Save .lrc file alongside the track for players like AIMP, Harmonoid, Moosync
+        # If synced_lyrics is available, save timestamped LRC.
+        # If only plain_lyrics is available, save plain text LRC so player doesn't show blank lyrics.
         if synced_lyrics:
             lrc_path = file_path.with_suffix(".lrc")
             with open(lrc_path, "w", encoding="utf-8") as f:
                 f.write(synced_lyrics)
+        elif plain_lyrics:
+            lrc_path = file_path.with_suffix(".lrc")
+            with open(lrc_path, "w", encoding="utf-8") as f:
+                f.write(plain_lyrics)
                 
         return True
     except Exception as e:
