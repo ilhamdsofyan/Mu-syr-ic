@@ -312,7 +312,8 @@ def download_album(artist: str, album_name: Optional[str] = None):
                             continue
                             
                         progress.update(track_task, completed=10, description=f"[cyan]Searching YT:[/] {track_desc}")
-                        yt_url = search_track(album_info.artist, track.title)
+                        expected_duration_s = track.duration_ms // 1000 if track.duration_ms else None
+                        yt_url = search_track(album_info.artist, track.title, expected_duration_s=expected_duration_s)
                         
                         if not yt_url:
                             progress.console.print(f"[red]❌ Not found on YT:[/] {track_desc}")
